@@ -12,6 +12,11 @@ dir,file=os.path.split(__file__)
 app.config['UPLOAD_FOLDER']=os.path.join(dir,'upload')
 app.config['MAX_CONTENT_PATH']=16000000
 
+
+@app.route('/')
+def index():
+   return render_template('upload.html')
+
 @app.route('/upload')
 def upload():
    return render_template('upload.html')
