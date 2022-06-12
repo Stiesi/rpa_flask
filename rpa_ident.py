@@ -36,7 +36,7 @@ def get_tdata(t):
 def create_sub(h,t,c):
     filename=h+c[-1].replace('(','').replace(')','').replace(':','_') ##header + (datetime)
     tdata = get_tdata(t)
-	meta = dict(name=c[0],order=c[1],date=c[2])
+    meta = dict(name=c[0],order=c[1],date=c[2])
     tdata[::2] = [td+',' for td in tdata[::2]]
     tdata[1::2] = [td+'\n' for td in tdata[1::2]]
     #tdata[1::2] = tdata[::2]+'\n'
