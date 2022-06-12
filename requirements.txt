@@ -1,6 +1,6 @@
 # This file contains package requirements for the deployment
 # installed via PIP. Installed before deployment initialization
-fastapi
+deta
 pandas
 numpy
 scipy
