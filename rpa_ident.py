@@ -252,7 +252,11 @@ if __name__=='__main__':
     btxt = gzip.compress(bytes(txt, 'utf-8'))
     h,t,c =  read_html("",txt)
     df = stack_rpa_data(h,t,c)
-    df.to_csv(htmlfile[:-5] + '.csv', index=False)
+    # to zip
+    zipfile = htmlfile[:-5]+'.zip'
+    compression_options = dict(method='zip', archive_name=htmlfile[:-5] + '.csv')
+
+    df.to_csv(zipfile,compression=compression_options,index=False)
     
     print(fit_visco(df))
     
