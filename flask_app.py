@@ -16,7 +16,7 @@ dir,file=os.path.split(__file__)
 app.config['UPLOAD_FOLDER']=os.path.join(dir,'upload')
 app.config['MAX_CONTENT_PATH']=16000000
 
-deta=Deta('a0f09ryv_2pV7HcRehUxG6uksRehNJ6tdPAy5Z8dd')
+
 #db = deta.Base('test')
 
 @app.route('/')
