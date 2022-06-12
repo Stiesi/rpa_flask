@@ -16,6 +16,8 @@ dir,file=os.path.split(__file__)
 app.config['UPLOAD_FOLDER']=os.path.join(dir,'upload')
 app.config['MAX_CONTENT_PATH']=16000000
 
+deta=Deta('a0f09ryv_2pV7HcRehUxG6uksRehNJ6tdPAy5Z8dd')
+#db = deta.Base('test')
 
 @app.route('/')
 def index():
@@ -64,10 +66,10 @@ def get_zip_data(df,meta,filename):
     return unique_dirname,arcfile
     
     
-def fitdata(filename):
+def fitdata(filename,eta_sequence=[1.25,10,2.5,5]):
     with open(filename) as fh:
         txt=fh.read()
-    eta_sequence=[1.25,10,2.5,5]
+    
     # convert to pandas
     #h,t,c =  rid.read_html(None,htmlfile)
     headers,tables,comps=rid.find_tables(txt)
