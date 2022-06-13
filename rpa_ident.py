@@ -75,10 +75,8 @@ def save_subs(headers,tables,comps):
     return files,dd
 
 
-
-
         
-def synchronize(sdash,nstar,temp,etarate=1):
+def synchronize(sdash,nstar,temp,etarate=1,testid=1):
     # create a data array with [time_s,S',n*,TKinv,etarate]
     # 
     # sdas, nstar , and temp are list of tuples (time, value)
@@ -106,8 +104,9 @@ def synchronize(sdash,nstar,temp,etarate=1):
     time*=60 #in sec
     trate = np.ones_like(time)*heatrate/60  # per sec
     eta = np.ones_like(time)*etarate*2*np.pi  # per sec
-    dataset =np.vstack((time,sda,nda,tempc,tki,eta,trate))
-    return dataset.reshape(7,-1).T
+    testnr = np.ones_like(time)*testid
+    dataset =np.vstack((time,sda,nda,tempc,tki,eta,trate,testnr))
+    return dataset.reshape(8,-1).T
 
     
     
@@ -170,7 +169,8 @@ def stack_rpa_data(headers,tables,comps,etarates_sequence=[1.25,10,2.5,5]):
     # sequence of rates 1/s
     etarates = np.array(etarates_sequence*12).reshape(12,4).T.ravel()
     ic = 0
-    datafield = np.ndarray(shape=(0,7))
+    datafield = np.ndarray(shape=(0,8))
+    testid=0
     for h,t,c,er in zip(headers,tables,comps,etarates):
         data = get_tdata(t)
         filename,datax,meta = create_sub(h,t,c)
@@ -178,6 +178,7 @@ def stack_rpa_data(headers,tables,comps,etarates_sequence=[1.25,10,2.5,5]):
         #txt = ','.join(data[2:])
         mya = np.array(data[2:],dtype=np.float32).reshape((-1,2))
         if ic==0:
+            testid+=1
             
             if 'Sdash' not in  filename:
                 print (filename,c)
@@ -198,7 +199,7 @@ def stack_rpa_data(headers,tables,comps,etarates_sequence=[1.25,10,2.5,5]):
 
             nstar = mya
             
-            newset = synchronize(sda, nstar, temp,er)
+            newset = synchronize(sda, nstar, temp,er,testid)
             datafield = np.vstack((datafield,newset))
             ic=-1
             
@@ -209,9 +210,10 @@ def stack_rpa_data(headers,tables,comps,etarates_sequence=[1.25,10,2.5,5]):
                                           'tempc',
                                           'tki',
                                           'eta',
-                                          'hrate'],
+                                          'hrate',
+                                          'test_no'],
                       )
-                
+    df['test_no']=df['test_no'].astype('int')
     return df
 
 
