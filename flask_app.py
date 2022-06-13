@@ -5,7 +5,7 @@ from io import BytesIO
 import uuid
 import zipfile
 
-from deta import Deta
+#from deta import Deta
 from flask import Flask, render_template, request,send_file,send_from_directory
 from werkzeug.utils import secure_filename
 
@@ -30,26 +30,29 @@ def upload():
 @app.route('/uploader', methods = ['GET', 'POST'])
 def upload_file():
    if request.method == 'POST':
+
+      unique_dirname = str(uuid.uuid4())
+      os.chdir(os.path.join(app.config['UPLOAD_FOLDER']))
+      os.mkdir(unique_dirname)
+      relative_dir = os.path.join(app.config['UPLOAD_FOLDER'],unique_dirname)
+
       f = request.files['file']
-      savename=os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename))
-      f.save(savename)
+      savename=os.path.join(relative_dir,secure_filename(f.filename))
+      basename=os.path.basename(savename) # filename without path
+      base,ext = os.path.splitext(basename) # filename without extension
       #f.save(f.filename)
-      print('file uploaded successfully')
-      df,res = fitdata(savename)            
-      dirname,arc_file = get_zip_data(df,res,savename)
+      f.save(savename)
+      print(f'file {f.filename} uploaded successfully as {savename}')
+
+      df,res = fitdata(savename)        
+      arc_file = get_zip_data(df,res,base,relative_dir)
       
-      print(dirname, arc_file)
-      dir = os.path.join(app.config['UPLOAD_FOLDER'],dirname)
-      return send_from_directory(dir,arc_file,as_attachment=True) 
+      print(unique_dirname, arc_file)
+      return send_from_directory(relative_dir,arc_file,as_attachment=True) 
       
-def get_zip_data(df,meta,filename):
-    unique_dirname = str(uuid.uuid4())
-    os.chdir(os.path.join(app.config['UPLOAD_FOLDER']))
-    os.mkdir(unique_dirname)
-    os.chdir(unique_dirname)
+def get_zip_data(df,meta,base,relative_dir):
     
-    basename=os.path.basename(filename) # filename without path
-    base,ext = os.path.splitext(basename) # filename without extension
+    os.chdir(relative_dir)    
     #outname = base+'.zip'
     # write df to zip
     #fullname=os.path.join(unique_dirname,outname)
@@ -63,7 +66,7 @@ def get_zip_data(df,meta,filename):
     zf = zipfile.ZipFile(arcfile,mode='a')
     zf.write(metafile,arcname=base+'.txt')
     zf.close()
-    return unique_dirname,arcfile
+    return arcfile
     
     
 def fitdata(filename,eta_sequence=[1.25,10,2.5,5]):

@@ -1,7 +1,7 @@
 # This file contains package requirements for the deployment
 # installed via PIP. Installed before deployment initialization
 flask
-deta
+#deta
 pandas
 numpy
 scipy
