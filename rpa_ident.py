@@ -175,7 +175,7 @@ def read_html(htmlfile=None,btxt=None):
 
 def stack_rpa_data(headers,tables,comps,
                    gammarates_sequence=[1.25,10,2.5,5],
-                   trigger=500):
+                   trigger=1000):
     #fnames,dd = save_subs(headers,tables,comps)
     # sequence of rates 1/s
     gammarates = np.array(gammarates_sequence*12).reshape(12,4).T.ravel()
