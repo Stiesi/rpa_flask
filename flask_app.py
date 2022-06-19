@@ -92,7 +92,7 @@ def fitdata(filename,eta_sequence=[1.25,10,2.5,5]):
     
     return df,{
             'fit_parameter': parameters ,
-            'flow function': 'log(n_star) = A + C * (1/temperature[K]) + (n-1)* log(eta[rad/s])',
+            'flow function': 'log(n_star) = log(A) + C * (1/temperature[K]) + (n-1)* log(gammap[rad/s])',
             'lower T[C]' : '80',
             'upper T[C]' : '120',
             }
