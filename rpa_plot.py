@@ -11,25 +11,35 @@ import plotly.graph_objects as go
 
 import rpa_ident as ri
 
-def plot(df,sx,sy,sz,title='RPA',fitstring='fit'):
+DEFAULT_PLOTLY_COLORS=['rgb(31, 119, 180)', 'rgb(255, 127, 14)',
+                       'rgb(44, 160, 44)', 'rgb(214, 39, 40)',
+                       'rgb(148, 103, 189)', 'rgb(140, 86, 75)',
+                       'rgb(227, 119, 194)', 'rgb(127, 127, 127)',
+                       'rgb(188, 189, 34)', 'rgb(23, 190, 207)']
+
+def plot(df,sx,sy,sz,title='RPA',fitstring='fit',filename='RPA'):
     traces=[]
-    hrmax=df.hrate.max()
+    # create colors and index from heatrate
+    # equal number of values in categories
+    categories = 4
+    df['col']=pd.qcut(df.hrate,categories,labels=range(categories))
     for testno in df.test_no.unique():
         dfs = df[df.test_no==testno]
         z=np.log(dfs.nstar.values)        
         x=dfs.tempc.values
         y=dfs.gammap.values
-        hra= dfs.hrate.values
-        hr = hra.mean()
-        col = (hr)/hrmax
-        print(col)
+        
+    
+        hr = dfs.hrate.mean()
+        col = dfs.col.values[0]
+        #print(col)
         gammap = dfs.gammap.values[0]
         traces.append(go.Scatter3d(z=z, x=x, y=y,
-                                   legendgroup='%.1f'%hr,
+                                   legendgroup='%.1f'%col,
                                    name=f'{testno} h {hr:.2f} gp {gammap:.2f}',
                                    mode='markers',
-                                   marker = dict(color=col,
-                                                 colorscale='Viridis',   # choose a colorscale
+                                   marker = dict(color=DEFAULT_PLOTLY_COLORS[col],
+                                                 #colorscale='Viridis',   # choose a colorscale
                                                  #opacity=0.8
                                                  )
                                    ))
@@ -47,7 +57,8 @@ def plot(df,sx,sy,sz,title='RPA',fitstring='fit'):
                       #margin=dict(l=65, r=50, b=65, t=90)
                       )
     #fig.show()
-    fig.write_html('RPA.html', auto_open=True)
+    fig.write_html(f'{filename}.html', auto_open=True)
+    
 
 
 if __name__=='__main__':
@@ -71,4 +82,4 @@ if __name__=='__main__':
     gpa, tkia = np.meshgrid(gammap,tki)
     logz = ri.viscosity_log(np.log(gpa),tkia,A,C,n)
     sr,tc = np.meshgrid(gammap,tempc)
-    plot(df,tc,sr,logz,title=parstr,fitstring=parstr)
+    plot(df,tc,sr,logz,title=parstr,fitstring=parstr,filename=zipfile[:-4])
