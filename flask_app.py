@@ -44,7 +44,10 @@ def upload_file():
       f.save(savename)
       print(f'file {f.filename} uploaded successfully as {savename}')
 
-      df,res = fitdata(savename)        
+      df,res = fitdata(savename)   
+      #figfile = os.path.join(relative_dir,base)
+      #rid.plot(df,res['fit_parameter'],title=basename,filename=figfile)
+      
       arc_file = get_zip_data(df,res,base,relative_dir)
       
       print(unique_dirname, arc_file)
@@ -58,6 +61,7 @@ def get_zip_data(df,meta,base,relative_dir):
     #fullname=os.path.join(unique_dirname,outname)
     arcfile = f'{base}.zip'
     metafile= base+'.txt'
+    #figfile= base+'.png'
     compression_options = dict(method='zip', archive_name=f'{base}.csv')
     df.to_csv(arcfile, compression=compression_options, index=False)
     # write meta dict to file
@@ -65,18 +69,19 @@ def get_zip_data(df,meta,base,relative_dir):
         print(meta,file=fm)
     zf = zipfile.ZipFile(arcfile,mode='a')
     zf.write(metafile,arcname=base+'.txt')
+    #zf.write(figfile,arcname=base+'.png')
     zf.close()
     return arcfile
     
     
-def fitdata(filename,gammarates_sequence=[1.25,10,2.5,5]):
+def fitdata(filename):#,gammarates_sequence=[1.25,10,2.5,5]):
     with open(filename) as fh:
         txt=fh.read()
     
     # convert to pandas
     #h,t,c =  rid.read_html(None,htmlfile)
     headers,tables,comps=rid.find_tables(txt)
-    df = rid.stack_rpa_data(headers,tables,comps,gammarates_sequence=gammarates_sequence)
+    df = rid.stack_rpa_data(headers,tables,comps)
     #df.to_csv(htmlfile[:-5] + '.csv', index=False)
     
     # do fitting of data
@@ -93,8 +98,8 @@ def fitdata(filename,gammarates_sequence=[1.25,10,2.5,5]):
     return df,{
             'fit_parameter': parameters ,
             'flow function': 'log(n_star) = log(A) + C * (1/temperature[K]) + (n-1)* log(gammad[rad/s])',
-            'lower T[C]' : '80',
-            'upper T[C]' : '120',
+            #'lower T[C]' : '80',
+            #'upper T[C]' : '120',
             }
             
 @app.route('/downloader', methods = ['GET', 'POST'])    
