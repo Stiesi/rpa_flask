@@ -17,6 +17,9 @@ import gzip
 def find_tables(txt):#### to do?
     txt=txt.replace('\r','')
     txt=txt.replace('\n','')
+    # check 16 x time in html file
+    nsets = len(re.findall('time',txt,re.IGNORECASE))
+    assert nsets==48; "html file has not 4 x 4 x [S', S'', n*] time sets"
     rexh=r'<h2>(.*?)</h2>'
     rext=r'<table.*?/table>'
     headers = re.findall(rexh,txt)#,re.DOTALL)#[:1]
@@ -117,8 +120,14 @@ def synchronize(sdash,nstar,temp,testid=1,trigger=0):
     dataset =np.vstack((time,sda,nda,tempc,trate,testnr))
     return dataset.reshape(6,-1).T
 
-    
-    
+# transform dataframes 
+def dfto_json(df):
+    dfjson = df.to_json(orient='split')
+    return dfjson
+
+def dfread_json(dfjson):
+    df = pd.read_json(dfjson,orient='split')
+    return df
 
 
 def read_html(htmlfile=None,btxt=None):
@@ -324,6 +333,7 @@ def plot(df,para,title='RPA',filename='nstar'):
 if __name__=='__main__':
     import os
     htmlfile=r"Rheology M-870-6 Batch 31.html"
+    #htmlfile=r'M-1470-224 Viscosity Data.html'
     #htmlfile=r"Rheology M-870-6 Batch 31.zip"
     fullpath = os.path.join('testdata',htmlfile)
 
